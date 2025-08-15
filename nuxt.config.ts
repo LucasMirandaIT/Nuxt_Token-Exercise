@@ -17,7 +17,4 @@ export default defineNuxtConfig({
     port: 8080,
     https: true,
   },
-  nitro: {
-    preset: "vercel",
-  },
 });
