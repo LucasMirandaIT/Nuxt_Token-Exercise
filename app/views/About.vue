@@ -4,7 +4,7 @@
     <p>This is the about page of the application.</p>
     <template v-if="!tokenExpired">
       <p>
-        Current Token: {{ currentToken }}
+        Current Token: Generated: {{ formatDate(currentToken.iat) }} Expires: {{ formatDate(currentToken.exp) }}
       </p>
     </template>
     <template v-else>
@@ -16,6 +16,13 @@
 <script setup>
 const tokenExpired = ref(false);
 const currentToken = ref('');
+
+const authRefreshHandler = useAuthFailureHandler();
+
+const formatDate = (timestamp) => {
+  const date = new Date(timestamp * 1000);
+  return date.toLocaleTimeString();
+};
 
 const checkToken = async () => {
   try {
@@ -32,6 +39,9 @@ const checkToken = async () => {
     console.log("Token is valid:", { valid });
     tokenExpired.value = !valid;
   } catch (error) {
+    if (error.status === 401) {
+      authRefreshHandler();
+    }
     console.error("Token verification failed:", { error });
     tokenExpired.value = true;
     // navigateTo({ name: "login" });
